@@ -20,6 +20,11 @@ public class SlotMachine {
 	private Text txtCrediti;
 	private Text txtBet;
 	private Text txtVincita;
+	private Label lblGirandola1;
+	private Label lblGirandola2;
+	private Label lblGirandola3;
+	private Label[] girandole = new Label[3];
+	private static int[] numeroImmagini = new int[3];
 
 	/**
 	 * Launch the application.
@@ -50,28 +55,31 @@ public class SlotMachine {
 		}
 	}
 
-	public void giraImmagini() {
-		// TODO Fedato - Far cambiare le tre immagini a caso (senza animazione)
-		/*
-		 * Quello che avevo in mente era tipo
-		 * 
-		 * int random = 0; random = random(); //Random tra 0 e numero delle
-		 * immagini
-		 * 
-		 */
-	}
-
 	public class ThreadGirandola extends Thread {
-		
+
 		private int nGirandola;
-		
-		public ThreadGirandola(int nGirandola){
+
+		public ThreadGirandola(int nGirandola) {
 			this.nGirandola = nGirandola;
 		}
-		
+
 		public void run() {
-			cambiaImmagine(nGirandola,2);
+			int immagineRisultato = random();
+			cambiaImmagine(nGirandola, immagineRisultato);
+			//una specie di thread per cambiare scritta/immagine
+			cambiaImmagineDaThread(nGirandola-1,"Il risultato e' " + immagineRisultato);
+			//saviamoci che questa girandola ha questa immagine
+			numeroImmagini[nGirandola-1] = immagineRisultato;
 		}
+	}
+	
+	private void cambiaImmagineDaThread(int numeroGirandola,String testo){
+		display.asyncExec(new Runnable(){
+			@Override
+			public void run() {
+				girandole[numeroGirandola].setText(testo);
+			}
+		});
 	}
 
 	public void gira() {
@@ -81,6 +89,7 @@ public class SlotMachine {
 		t1.start();
 		t2.start();
 		t3.start();
+
 	}
 
 	/**
@@ -91,27 +100,35 @@ public class SlotMachine {
 	 *            delle immagini
 	 */
 	private void cambiaImmagine(int girandola, int indexImmagine) {
-		girandola-=1; //Così possiamo usare girandola 1-2-3 e non 0-1-2
-		
+		girandola -= 1; // Così possiamo usare girandola 1-2-3 e non 0-1-2
+
 		// TODO Fedato - Cambia immagine di una delle tre girandole
-		
-		  //for(int i=0;i<Numero di rotazioni che deve fare (a caso tipo);i++){
-		    //random così sembra uno shuffle casiale 
-		    //int random = random();
-		  	//OggettoGirandola[girandola].immagine = listaImmagini[random];
-		for(int i=0;i<10;i++){
+
+		// i<Numero di rotazioni che deve fare (a caso tipo)
+		int giraFinoA = (int)(Math.random() * 20 + 20);
+		for (int i = 0; i < giraFinoA; i++) {
+			// random così sembra uno shuffle casuale
 			System.out.println("Ciao da girandola numero " + girandola);
-			int randSleep = (int)((Math.random() * 50) + 50);
+			int randSleep = (int) ((Math.random() * 100) + 50);
 			try {
 				Thread.sleep(randSleep);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
+			int immagineRandom = random();
+			cambiaImmagineDaThread(girandola,"" + immagineRandom);
+			// alla fine impostiamo l'immagine quella finale
+			// OggettoGirandola[girandola].immagine =
+			// listaImmagini[indexImmagine];
 		}
-		  //}
-		  //alla fine impostiamo l'immagine quella finale
-		  //OggettoGirandola[girandola].immagine = listaImmagini[indexImmagine];
-		 
+	}
+
+	private boolean haVinto() {
+		if (numeroImmagini[0] == numeroImmagini[1] && numeroImmagini[0] == numeroImmagini[2]) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	/**
@@ -119,8 +136,7 @@ public class SlotMachine {
 	 * @return Un numero random che rappresenta una immagine (0-numeroImmagini)
 	 */
 	public static int random() {
-		// return (int)(Math.Random() * listaImmagini.Length);
-		return 0;
+		 return (int)(Math.random() * 10/*listaImmagini.Length*/);
 	}
 
 	/**
@@ -130,7 +146,6 @@ public class SlotMachine {
 		shlSlotMachine = new Shell();
 		shlSlotMachine.setSize(500, 500);
 		shlSlotMachine.setText("Slot Machine");
-		
 
 		Composite compositeTop = new Composite(shlSlotMachine, SWT.NONE);
 		compositeTop.setBounds(10, 10, 464, 58);
@@ -190,47 +205,51 @@ public class SlotMachine {
 		btnGira.setSize(75, 75);
 		btnGira.setText("Gira");
 		btnGira.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
-		
-		Label lblGirandola1 = new Label(shlSlotMachine, SWT.BORDER | SWT.WRAP | SWT.SHADOW_NONE | SWT.CENTER);
+
+		lblGirandola1 = new Label(shlSlotMachine, SWT.BORDER | SWT.WRAP | SWT.SHADOW_NONE | SWT.CENTER);
 		lblGirandola1.setBounds(10, 75, 150, 150);
 		formToolkit.adapt(lblGirandola1, true, true);
 		lblGirandola1.setText("Immagine1");
-		
-		Label lblGirandola2 = new Label(shlSlotMachine, SWT.BORDER | SWT.WRAP | SWT.SHADOW_NONE | SWT.CENTER);
+		girandole[0] = lblGirandola1;
+
+		lblGirandola2 = new Label(shlSlotMachine, SWT.BORDER | SWT.WRAP | SWT.SHADOW_NONE | SWT.CENTER);
 		lblGirandola2.setText("Immagine2");
 		lblGirandola2.setBounds(168, 75, 150, 150);
 		formToolkit.adapt(lblGirandola2, true, true);
-		
-		Label lblGirandola3 = new Label(shlSlotMachine, SWT.BORDER | SWT.WRAP | SWT.SHADOW_NONE | SWT.CENTER);
+		girandole[1] = lblGirandola2;
+
+		lblGirandola3 = new Label(shlSlotMachine, SWT.BORDER | SWT.WRAP | SWT.SHADOW_NONE | SWT.CENTER);
 		lblGirandola3.setText("Immagine3");
 		lblGirandola3.setBounds(324, 75, 150, 150);
 		formToolkit.adapt(lblGirandola3, true, true);
-		
+		girandole[2] = lblGirandola3;
+
 		txtCrediti = new Text(shlSlotMachine, SWT.BORDER | SWT.READ_ONLY | SWT.CENTER);
 		txtCrediti.setText("Crediti");
 		txtCrediti.setBounds(10, 281, 150, 21);
 		formToolkit.adapt(txtCrediti, true, true);
-		
+
 		Label lblCrediti = new Label(shlSlotMachine, SWT.NONE);
+		lblCrediti.setBackground(SWTResourceManager.getColor(240, 240, 240));
 		lblCrediti.setBounds(10, 260, 150, 15);
 		formToolkit.adapt(lblCrediti, true, true);
 		lblCrediti.setText("Crediti");
-		
+
 		txtBet = new Text(shlSlotMachine, SWT.BORDER);
 		txtBet.setText("Bet");
 		txtBet.setBounds(210, 281, 76, 21);
 		formToolkit.adapt(txtBet, true, true);
-		
+
 		Label lblBet = new Label(shlSlotMachine, SWT.NONE);
 		lblBet.setBounds(210, 260, 76, 15);
 		formToolkit.adapt(lblBet, true, true);
 		lblBet.setText("Bet");
-		
+
 		txtVincita = new Text(shlSlotMachine, SWT.BORDER);
 		txtVincita.setText("Vincita");
 		txtVincita.setBounds(324, 281, 150, 21);
 		formToolkit.adapt(txtVincita, true, true);
-		
+
 		Label lblPossibileVincita = new Label(shlSlotMachine, SWT.NONE);
 		lblPossibileVincita.setBounds(324, 260, 150, 15);
 		formToolkit.adapt(lblPossibileVincita, true, true);
