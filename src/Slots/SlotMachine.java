@@ -96,8 +96,24 @@ public class SlotMachine {
 		t1.start();
 		t2.start();
 		t3.start();
-
+		while(true){
+			if (!t1.isAlive() && !t2.isAlive() && !t3.isAlive()){
+				controlloF();
+				return;
+			}
+		}
 	}
+	public void controlloF(){
+		bet = 0;
+		txtBet.setText("" + bet);
+		if (haVinto()){
+			crediti = crediti + pvincita;
+		}
+		txtCrediti.setText("" + crediti);
+		pvincita = 0;
+		txtVincita.setText("" + pvincita);
+	}
+	
 
 	/**
 	 * @param girandola
@@ -215,8 +231,9 @@ public class SlotMachine {
 					txtBet.setText("" + bet);
 					crediti = Integer.parseInt(txtCrediti.getText());
 					crediti = crediti - 1;
+					pvincita = bet*2;
 					txtCrediti.setText("" + crediti);
-					txtVincita.setText("" + (bet * 2));
+					txtVincita.setText("" + pvincita);
 				}
 				else {
 					MessageDialog.openError(shlSlotMachine, "SCOMMESSA NON VALIDA", "Non hai crediti per scommettere!");
@@ -235,8 +252,9 @@ public class SlotMachine {
 				bet = Integer.parseInt(txtCrediti.getText());
 				txtBet.setText("" + bet);
 				crediti = 0;
+				pvincita = bet * 2;
 				txtCrediti.setText("" + crediti);
-				txtVincita.setText("" + (bet * 2));
+				txtVincita.setText("" + pvincita);
 			}
 		});
 		btnScommettiMax.setLocation(270, 10);
