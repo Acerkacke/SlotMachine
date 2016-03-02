@@ -4,6 +4,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.wb.swt.SWTResourceManager;
 import org.eclipse.swt.widgets.Composite;
@@ -27,6 +28,10 @@ public class SlotMachine {
 	private Label[] girandole = new Label[3];
 	private static int[] numeroImmagini = new int[3];
 	private static Image[] immagini = new Image[9]; 
+	private int crediti = 100;
+	private int bet = 0;
+	private int pvincita = 0;
+	
 
 	/**
 	 * Launch the application.
@@ -153,7 +158,7 @@ public class SlotMachine {
 		compositeTop.setBounds(10, 10, 464, 58);
 
 		txtTitle = new Text(compositeTop, SWT.SINGLE | SWT.READ_ONLY | SWT.BORDER | SWT.CENTER);
-		;
+		
 		txtTitle.setText("\n\nSlot Machine");
 		txtTitle.setBounds(0, 0, 464, 58);
 
@@ -179,18 +184,61 @@ public class SlotMachine {
 		btnReset.setText("Reset");
 
 		Button btnRitira = new Button(compositeBottoni, SWT.CENTER);
+		btnRitira.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				bet = Integer.parseInt(txtBet.getText());
+				crediti = Integer.parseInt(txtCrediti.getText());
+				pvincita = (bet + crediti);
+				bet = 0;
+				crediti = 0;
+				txtBet.setText("" + bet);
+				txtCrediti.setText("" + crediti);
+				txtVincita.setText("" + pvincita);
+				MessageDialog.openInformation(shlSlotMachine, "RITIRATO", "Ti sei ritirato vincendo: " + pvincita + " crediti!");
+			}
+		});
 		btnRitira.setLocation(90, 10);
 		btnRitira.setSize(75, 75);
 		btnRitira.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 		btnRitira.setText("Ritira");
 
 		Button btnScommettiUno = new Button(compositeBottoni, SWT.CENTER);
+		btnScommettiUno.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				int t;
+				t = Integer.parseInt(txtCrediti.getText());
+				if (t > 0){
+					bet = Integer.parseInt(txtBet.getText());
+					bet = bet + 1;
+					txtBet.setText("" + bet);
+					crediti = Integer.parseInt(txtCrediti.getText());
+					crediti = crediti - 1;
+					txtCrediti.setText("" + crediti);
+					txtVincita.setText("" + (bet * 2));
+				}
+				else {
+					MessageDialog.openError(shlSlotMachine, "SCOMMESSA NON VALIDA", "Non hai crediti per scommettere!");
+				}
+			}
+		});
 		btnScommettiUno.setLocation(180, 10);
 		btnScommettiUno.setSize(75, 75);
 		btnScommettiUno.setText("Scommetti");
 		btnScommettiUno.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 
 		Button btnScommettiMax = new Button(compositeBottoni, SWT.CENTER);
+		btnScommettiMax.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				bet = Integer.parseInt(txtCrediti.getText());
+				txtBet.setText("" + bet);
+				crediti = 0;
+				txtCrediti.setText("" + crediti);
+				txtVincita.setText("" + (bet * 2));
+			}
+		});
 		btnScommettiMax.setLocation(270, 10);
 		btnScommettiMax.setSize(75, 75);
 		btnScommettiMax.setText("Max");
@@ -227,7 +275,7 @@ public class SlotMachine {
 		girandole[2] = lblGirandola3;
 
 		txtCrediti = new Text(shlSlotMachine, SWT.BORDER | SWT.READ_ONLY | SWT.CENTER);
-		txtCrediti.setText("Crediti");
+		txtCrediti.setText("" + crediti);
 		txtCrediti.setBounds(10, 281, 150, 21);
 		formToolkit.adapt(txtCrediti, true, true);
 
@@ -238,7 +286,7 @@ public class SlotMachine {
 		lblCrediti.setText("Crediti");
 
 		txtBet = new Text(shlSlotMachine, SWT.BORDER);
-		txtBet.setText("Bet");
+		txtBet.setText("" + bet);
 		txtBet.setBounds(210, 281, 76, 21);
 		formToolkit.adapt(txtBet, true, true);
 
@@ -248,7 +296,7 @@ public class SlotMachine {
 		lblBet.setText("Bet");
 
 		txtVincita = new Text(shlSlotMachine, SWT.BORDER);
-		txtVincita.setText("Vincita");
+		txtVincita.setText("" + pvincita);
 		txtVincita.setBounds(324, 281, 150, 21);
 		formToolkit.adapt(txtVincita, true, true);
 
