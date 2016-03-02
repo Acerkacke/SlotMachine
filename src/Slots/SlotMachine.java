@@ -12,7 +12,6 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Image;
 
 public class SlotMachine {
 	Display display;
@@ -27,11 +26,24 @@ public class SlotMachine {
 	private Label lblGirandola3;
 	private Label[] girandole = new Label[3];
 	private static int[] numeroImmagini = new int[3];
-	private static Image[] immagini = new Image[9]; 
+
 	private int crediti = 100;
 	private int bet = 0;
 	private int pvincita = 0;
 	
+
+	private static String[] pathImmagini = {
+			"/Immagini/arancia.png",
+			"/Immagini/banane.png",
+			"/Immagini/bar.png",
+			"/Immagini/bigwin.png",
+			"/Immagini/ciliegie.png",
+			"/Immagini/limone.png",
+			"/Immagini/melone.png",
+			"/Immagini/prugna.png",
+			"/Immagini/sette.png"
+	}; 
+
 
 	/**
 	 * Launch the application.
@@ -84,7 +96,7 @@ public class SlotMachine {
 		display.asyncExec(new Runnable(){
 			@Override
 			public void run() {
-				girandole[numeroGirandola].setImage(immagini[numero]);
+				girandole[numeroGirandola].setImage(SWTResourceManager.getImage(SlotMachine.class, pathImmagini[numero]));
 			}
 		});
 	}
@@ -96,12 +108,14 @@ public class SlotMachine {
 		t1.start();
 		t2.start();
 		t3.start();
+
 		while(true){
 			if (!t1.isAlive() && !t2.isAlive() && !t3.isAlive()){
 				controlloF();
 				return;
 			}
 		}
+
 	}
 	public void controlloF(){
 		bet = 0;
@@ -159,7 +173,7 @@ public class SlotMachine {
 	 * @return Un numero random che rappresenta una immagine (0-numeroImmagini)
 	 */
 	public static int random() {
-		 return (int)(Math.random() * 10/*listaImmagini.Length*/);
+		 return (int)(Math.random() * pathImmagini.length);
 	}
 
 	/**
@@ -275,9 +289,9 @@ public class SlotMachine {
 		btnGira.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 
 		lblGirandola1 = new Label(shlSlotMachine, SWT.BORDER | SWT.WRAP | SWT.SHADOW_NONE | SWT.CENTER);
+		lblGirandola1.setImage(SWTResourceManager.getImage(SlotMachine.class, "/Immagini/arancia.png"));
 		lblGirandola1.setBounds(10, 75, 150, 150);
 		formToolkit.adapt(lblGirandola1, true, true);
-		lblGirandola1.setText("Immagine1");
 		girandole[0] = lblGirandola1;
 
 		lblGirandola2 = new Label(shlSlotMachine, SWT.BORDER | SWT.WRAP | SWT.SHADOW_NONE | SWT.CENTER);
