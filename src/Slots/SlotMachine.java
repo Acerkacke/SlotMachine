@@ -11,6 +11,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
 
 public class SlotMachine {
 	Display display;
@@ -25,6 +26,7 @@ public class SlotMachine {
 	private Label lblGirandola3;
 	private Label[] girandole = new Label[3];
 	private static int[] numeroImmagini = new int[3];
+	private static Image[] immagini = new Image[9]; 
 
 	/**
 	 * Launch the application.
@@ -67,17 +69,17 @@ public class SlotMachine {
 			int immagineRisultato = random();
 			cambiaImmagine(nGirandola, immagineRisultato);
 			//una specie di thread per cambiare scritta/immagine
-			cambiaImmagineDaThread(nGirandola-1,"Il risultato e' " + immagineRisultato);
+			cambiaImmagineDaThread(nGirandola-1,immagineRisultato);
 			//saviamoci che questa girandola ha questa immagine
 			numeroImmagini[nGirandola-1] = immagineRisultato;
 		}
 	}
 	
-	private void cambiaImmagineDaThread(int numeroGirandola,String testo){
+	private void cambiaImmagineDaThread(int numeroGirandola,int numero){
 		display.asyncExec(new Runnable(){
 			@Override
 			public void run() {
-				girandole[numeroGirandola].setText(testo);
+				girandole[numeroGirandola].setImage(immagini[numero]);
 			}
 		});
 	}
@@ -116,7 +118,7 @@ public class SlotMachine {
 				e.printStackTrace();
 			}
 			int immagineRandom = random();
-			cambiaImmagineDaThread(girandola,"" + immagineRandom);
+			cambiaImmagineDaThread(girandola, immagineRandom);
 			// alla fine impostiamo l'immagine quella finale
 			// OggettoGirandola[girandola].immagine =
 			// listaImmagini[indexImmagine];
