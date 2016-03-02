@@ -11,7 +11,6 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Image;
 
 public class SlotMachine {
 	Display display;
@@ -26,7 +25,9 @@ public class SlotMachine {
 	private Label lblGirandola3;
 	private Label[] girandole = new Label[3];
 	private static int[] numeroImmagini = new int[3];
-	private static Image[] immagini = new Image[9]; 
+	private static String[] pathImmagini = {
+			
+	}; 
 
 	/**
 	 * Launch the application.
@@ -79,7 +80,7 @@ public class SlotMachine {
 		display.asyncExec(new Runnable(){
 			@Override
 			public void run() {
-				girandole[numeroGirandola].setImage(immagini[numero]);
+				girandole[numeroGirandola].setImage(SWTResourceManager.getImage(pathImmagini[numero]));
 			}
 		});
 	}
@@ -138,7 +139,7 @@ public class SlotMachine {
 	 * @return Un numero random che rappresenta una immagine (0-numeroImmagini)
 	 */
 	public static int random() {
-		 return (int)(Math.random() * 10/*listaImmagini.Length*/);
+		 return (int)(Math.random() * pathImmagini.length);
 	}
 
 	/**
@@ -209,6 +210,7 @@ public class SlotMachine {
 		btnGira.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 
 		lblGirandola1 = new Label(shlSlotMachine, SWT.BORDER | SWT.WRAP | SWT.SHADOW_NONE | SWT.CENTER);
+		lblGirandola1.setImage(SWTResourceManager.getImage("C:\\Users\\Public\\Pictures\\Sample Pictures\\Desert.jpg"));
 		lblGirandola1.setBounds(10, 75, 150, 150);
 		formToolkit.adapt(lblGirandola1, true, true);
 		lblGirandola1.setText("Immagine1");
