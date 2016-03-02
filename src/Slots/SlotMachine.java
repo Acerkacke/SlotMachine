@@ -26,7 +26,15 @@ public class SlotMachine {
 	private Label[] girandole = new Label[3];
 	private static int[] numeroImmagini = new int[3];
 	private static String[] pathImmagini = {
-			
+			"/Immagini/arancia.png",
+			"/Immagini/banane.png",
+			"/Immagini/bar.png",
+			"/Immagini/bigwin.png",
+			"/Immagini/ciliegie.png",
+			"/Immagini/limone.png",
+			"/Immagini/melone.png",
+			"/Immagini/prugna.png",
+			"/Immagini/sette.png"
 	}; 
 
 	/**
@@ -80,7 +88,7 @@ public class SlotMachine {
 		display.asyncExec(new Runnable(){
 			@Override
 			public void run() {
-				girandole[numeroGirandola].setImage(SWTResourceManager.getImage(pathImmagini[numero]));
+				girandole[numeroGirandola].setImage(SWTResourceManager.getImage(SlotMachine.class, pathImmagini[numero]));
 			}
 		});
 	}
@@ -92,7 +100,7 @@ public class SlotMachine {
 		t1.start();
 		t2.start();
 		t3.start();
-
+		
 	}
 
 	/**
@@ -210,10 +218,9 @@ public class SlotMachine {
 		btnGira.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 
 		lblGirandola1 = new Label(shlSlotMachine, SWT.BORDER | SWT.WRAP | SWT.SHADOW_NONE | SWT.CENTER);
-		lblGirandola1.setImage(SWTResourceManager.getImage("C:\\Users\\Public\\Pictures\\Sample Pictures\\Desert.jpg"));
+		lblGirandola1.setImage(SWTResourceManager.getImage(SlotMachine.class, "/Immagini/arancia.png"));
 		lblGirandola1.setBounds(10, 75, 150, 150);
 		formToolkit.adapt(lblGirandola1, true, true);
-		lblGirandola1.setText("Immagine1");
 		girandole[0] = lblGirandola1;
 
 		lblGirandola2 = new Label(shlSlotMachine, SWT.BORDER | SWT.WRAP | SWT.SHADOW_NONE | SWT.CENTER);
