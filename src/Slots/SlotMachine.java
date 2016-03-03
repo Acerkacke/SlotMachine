@@ -238,24 +238,31 @@ public class SlotMachine implements KeyListener {
 	 */
 	protected void createContents() {
 		shlSlotMachine = new Shell();
+		shlSlotMachine.setBackground(SWTResourceManager.getColor(SWT.COLOR_LIST_SELECTION));
 		shlSlotMachine.setSize(500, 500);
 		shlSlotMachine.setText("Slot Machine");
 		shlSlotMachine.addKeyListener(this);
+		shlSlotMachine.setText("Progetto di Crema Fedato e Kawkab");
 
 		Composite compositeTop = new Composite(shlSlotMachine, SWT.NONE);
 		compositeTop.setBounds(10, 10, 464, 58);
 
 		txtTitle = new Text(compositeTop, SWT.SINGLE | SWT.READ_ONLY | SWT.BORDER | SWT.CENTER);
+
+		txtTitle.setFont(SWTResourceManager.getFont("Segoe UI Light", 28, SWT.NORMAL));
+		txtTitle.setForeground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		txtTitle.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_BACKGROUND_GRADIENT));
 		txtTitle.setText("\n\nSlot Machine");
 		txtTitle.setBounds(0, 0, 464, 58);
 		txtTitle.addKeyListener(this);
 
 		Composite compositeBottoni = new Composite(shlSlotMachine, SWT.NONE);
+		compositeBottoni.setBackground(SWTResourceManager.getColor(SWT.COLOR_LINK_FOREGROUND));
 		compositeBottoni.setBounds(10, 350, 464, 100);
 
 		Button btnReset = new Button(compositeBottoni, SWT.NONE);
-		btnReset.setLocation(0, 10);
-		btnReset.setSize(75, 75);
+		btnReset.setLocation(10, 10);
+		btnReset.setSize(65, 75);
 		btnReset.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -353,12 +360,13 @@ public class SlotMachine implements KeyListener {
 			}
 		});
 		btnGira.setLocation(389, 10);
-		btnGira.setSize(75, 75);
+		btnGira.setSize(65, 75);
 		btnGira.setText("Gira");
 		btnGira.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 		btnGira.addKeyListener(this);
 
 		lblGirandola1 = new Label(shlSlotMachine, SWT.BORDER | SWT.WRAP | SWT.SHADOW_NONE | SWT.CENTER);
+		lblGirandola1.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_HIGHLIGHT_SHADOW));
 		lblGirandola1.setImage(SWTResourceManager.getImage(SlotMachine.class, "/Immagini/arancia.png"));
 		lblGirandola1.setBounds(10, 75, 150, 150);
 		formToolkit.adapt(lblGirandola1, true, true);
