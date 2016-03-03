@@ -26,12 +26,9 @@ public class SlotMachine {
 	private Label lblGirandola3;
 	private Label[] girandole = new Label[3];
 	private static int[] numeroImmagini = new int[3];
-
-	private int crediti = 100;
-	private int bet = 0;
+	private int crediti = 99;
+	private int bet = 1;
 	private int pvincita = 0;
-	
-
 	private static String[] pathImmagini = {
 			"/Immagini/arancia.png",
 			"/Immagini/banane.png",
@@ -43,7 +40,8 @@ public class SlotMachine {
 			"/Immagini/prugna.png",
 			"/Immagini/sette.png"
 	}; 
-
+	private int threadCheHannoFinito = 0;
+	private boolean haFinito = true;
 
 	/**
 	 * Launch the application.
@@ -89,6 +87,7 @@ public class SlotMachine {
 			cambiaImmagineDaThread(nGirandola-1,immagineRisultato);
 			//saviamoci che questa girandola ha questa immagine
 			numeroImmagini[nGirandola-1] = immagineRisultato;
+			finisci();
 		}
 	}
 	
@@ -102,30 +101,63 @@ public class SlotMachine {
 	}
 
 	public void gira() {
-		ThreadGirandola t1 = new ThreadGirandola(1);
-		ThreadGirandola t2 = new ThreadGirandola(2);
-		ThreadGirandola t3 = new ThreadGirandola(3);
-		t1.start();
-		t2.start();
-		t3.start();
-
-		while(true){
-			if (!t1.isAlive() && !t2.isAlive() && !t3.isAlive()){
-				controlloF();
-				return;
+		if(haFinito){
+			if(bet > 0){
+				threadCheHannoFinito = 0;
+				haFinito = false;
+				ThreadGirandola t1 = new ThreadGirandola(1);
+				ThreadGirandola t2 = new ThreadGirandola(2);
+				ThreadGirandola t3 = new ThreadGirandola(3);
+				t1.start();
+				t2.start();
+				t3.start();
+			}else{
+				System.out.println("Devi scommettere qualcosa pero'");
 			}
+		}else{
+			System.out.println("Non ha neancora finito");
 		}
-
 	}
-	public void controlloF(){
-		bet = 0;
-		txtBet.setText("" + bet);
-		if (haVinto()){
-			crediti = crediti + pvincita;
+	/**
+	 * Chiamato dai thread per indicare che le girandole hanno finito di girare
+	 */
+	public void finisci(){
+		threadCheHannoFinito++;
+		if(threadCheHannoFinito >= 3){
+			haFinito = true;
+			finito();
 		}
-		txtCrediti.setText("" + crediti);
+	}
+	
+	/**
+	 * Quando le girandole hanno finito di girare
+	 */
+	public void finito(){
+		System.out.println("Finito");
+		controlloF();
+	}
+	/**
+	 * Viene chiamato da un thread quindi ha bisogno di usare il asyncExec
+	 */
+	public void controlloF(){
+		
+		bet = 1;
+		crediti -= 1;
 		pvincita = 0;
-		txtVincita.setText("" + pvincita);
+		
+		display.asyncExec(new Runnable(){
+			@Override
+			public void run() {
+				
+				txtBet.setText("" + bet);
+				if (haVinto()){
+					crediti += pvincita;
+				}
+				txtCrediti.setText("" + crediti);
+				
+				txtVincita.setText("" + pvincita);
+			}
+		});
 	}
 	
 
@@ -192,14 +224,6 @@ public class SlotMachine {
 		txtTitle.setText("\n\nSlot Machine");
 		txtTitle.setBounds(0, 0, 464, 58);
 
-		// TODO Wassim - mettere le tre immagini e salvarle
-		/*
-		 * Spazio per wassim
-		 * 
-		 * 
-		 * 
-		 */
-
 		Composite compositeBottoni = new Composite(shlSlotMachine, SWT.NONE);
 		compositeBottoni.setBounds(10, 350, 464, 100);
 
@@ -222,9 +246,9 @@ public class SlotMachine {
 				pvincita = (bet + crediti);
 				bet = 0;
 				crediti = 0;
-				txtBet.setText("" + bet);
-				txtCrediti.setText("" + crediti);
-				txtVincita.setText("" + pvincita);
+				txtBet.setText("0");
+				txtCrediti.setText("0");
+				txtVincita.setText("0");
 				MessageDialog.openInformation(shlSlotMachine, "RITIRATO", "Ti sei ritirato vincendo: " + pvincita + " crediti!");
 			}
 		});
@@ -256,7 +280,7 @@ public class SlotMachine {
 		});
 		btnScommettiUno.setLocation(180, 10);
 		btnScommettiUno.setSize(75, 75);
-		btnScommettiUno.setText("Scommetti");
+		btnScommettiUno.setText("Bet +1");
 		btnScommettiUno.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 
 		Button btnScommettiMax = new Button(compositeBottoni, SWT.CENTER);
@@ -273,7 +297,7 @@ public class SlotMachine {
 		});
 		btnScommettiMax.setLocation(270, 10);
 		btnScommettiMax.setSize(75, 75);
-		btnScommettiMax.setText("Max");
+		btnScommettiMax.setText("Bet Max");
 		btnScommettiMax.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 
 		Button btnGira = new Button(compositeBottoni, SWT.CENTER);
@@ -295,13 +319,13 @@ public class SlotMachine {
 		girandole[0] = lblGirandola1;
 
 		lblGirandola2 = new Label(shlSlotMachine, SWT.BORDER | SWT.WRAP | SWT.SHADOW_NONE | SWT.CENTER);
-		lblGirandola2.setText("Immagine2");
+		lblGirandola2.setImage(SWTResourceManager.getImage(SlotMachine.class, "/Immagini/banane.png"));
 		lblGirandola2.setBounds(168, 75, 150, 150);
 		formToolkit.adapt(lblGirandola2, true, true);
 		girandole[1] = lblGirandola2;
 
 		lblGirandola3 = new Label(shlSlotMachine, SWT.BORDER | SWT.WRAP | SWT.SHADOW_NONE | SWT.CENTER);
-		lblGirandola3.setText("Immagine3");
+		lblGirandola3.setImage(SWTResourceManager.getImage(SlotMachine.class, "/Immagini/bar.png"));
 		lblGirandola3.setBounds(324, 75, 150, 150);
 		formToolkit.adapt(lblGirandola3, true, true);
 		girandole[2] = lblGirandola3;
