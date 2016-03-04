@@ -51,14 +51,13 @@ public class SlotMachine implements KeyListener {
 	private Clip levaClip;
 	private AudioInputStream audioIn;
 
-	
 	/**
 	 * Launch the application.
 	 * 
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		
+
 		try {
 			SlotMachine window = new SlotMachine();
 			window.open();
@@ -66,12 +65,12 @@ public class SlotMachine implements KeyListener {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * Costruttore vuoto
 	 */
-	protected SlotMachine(){
-        
+	protected SlotMachine() {
+
 	}
 
 	/**
@@ -92,20 +91,49 @@ public class SlotMachine implements KeyListener {
 	public class ThreadGirandola extends Thread {
 
 		private int nGirandola;
+		private int nImmagine;
 
-		public ThreadGirandola(int nGirandola) {
+		public ThreadGirandola(int nGirandola, int nImmagine) {
 			this.nGirandola = nGirandola;
+			this.nImmagine = nImmagine;
 		}
 
 		public void run() {
-			int immagineRisultato = random();
-			cambiaImmagine(nGirandola, immagineRisultato);
-			// una specie di thread per cambiare scritta/immagine
-			cambiaImmagineDaThread(nGirandola - 1, immagineRisultato);
+			if (nImmagine == -1) {
+				nImmagine = random();
+			}
+			cambiaImmagine(nGirandola, nImmagine);
 			// saviamoci che questa girandola ha questa immagine
-			numeroImmagini[nGirandola - 1] = immagineRisultato;
+			numeroImmagini[nGirandola - 1] = nImmagine;
 			finisci();
 		}
+	}
+
+	/**
+	 * @param girandola
+	 *            Di quale ruota cambiare l'immagine
+	 * @param indexImmagine
+	 *            Qual'è la posizione dell'immagine da prendere sulla lista
+	 *            delle immagini
+	 */
+	private void cambiaImmagine(int girandola, int indexImmagine) {
+		girandola -= 1; // Così possiamo usare girandola 1-2-3 e non 0-1-2
+
+		// i<Numero di rotazioni che deve fare (a caso tipo)
+		int giraFinoA = (int) (Math.random() * 20 + 20);
+		for (int i = 0; i < giraFinoA; i++) {
+			// random così sembra uno shuffle casuale
+			// System.out.println("Ciao da girandola numero " + girandola);
+			int randSleep = (int) ((Math.random() * 10) + 50);
+			try {
+				Thread.sleep(randSleep);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			int immagineRandom = random();
+			cambiaImmagineDaThread(girandola, immagineRandom);
+		}
+		cambiaImmagineDaThread(girandola, indexImmagine);
 	}
 
 	private void cambiaImmagineDaThread(int numeroGirandola, int numero) {
@@ -117,29 +145,34 @@ public class SlotMachine implements KeyListener {
 			}
 		});
 	}
-	
-	public void playSound(){
-		try{
+
+	public void playSound() {
+		try {
 			File file = new File("src/Suoni/Leva.wav");
-	        audioIn = AudioSystem.getAudioInputStream(file);
+			audioIn = AudioSystem.getAudioInputStream(file);
 			levaClip = AudioSystem.getClip();
-	        levaClip.open(audioIn);
+			levaClip.open(audioIn);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		levaClip.start();
 	}
-	
-	
+
 	public void gira() {
 		if (haFinito) {
 			if (bet > 0) {
 				playSound();
 				threadCheHannoFinito = 0;
 				haFinito = false;
-				ThreadGirandola t1 = new ThreadGirandola(1);
-				ThreadGirandola t2 = new ThreadGirandola(2);
-				ThreadGirandola t3 = new ThreadGirandola(3);
+
+				int immagineComune = -1;
+				if (Math.random() * 100 > 90) {
+					System.out.println("Adesso ti faccio vincere");
+					immagineComune = random();
+				}
+				ThreadGirandola t1 = new ThreadGirandola(1, immagineComune);
+				ThreadGirandola t2 = new ThreadGirandola(2, immagineComune);
+				ThreadGirandola t3 = new ThreadGirandola(3, immagineComune);
 				t1.start();
 				t2.start();
 				t3.start();
@@ -161,21 +194,20 @@ public class SlotMachine implements KeyListener {
 			finito();
 		}
 	}
-	
-private void stopPlay(){
-		if(levaClip != null){
+
+	private void stopPlay() {
+		if (levaClip != null) {
 			levaClip.stop();
 			levaClip.close();
 			levaClip = null;
 		}
 	}
 
-
 	/**
 	 * Quando le girandole hanno finito di girare
 	 */
 	public void finito() {
-		//System.out.println("Finito");
+		// System.out.println("Finito");
 		stopPlay();
 		controlloF();
 	}
@@ -227,37 +259,12 @@ private void stopPlay(){
 	}
 
 	public void MessageDialogDaThread(String titolo, String testo) {
-		MessageDialog.openError(shlSlotMachine, titolo, testo);
-	}
-
-	/**
-	 * @param girandola
-	 *            Di quale ruota cambiare l'immagine
-	 * @param indexImmagine
-	 *            Qual'è la posizione dell'immagine da prendere sulla lista
-	 *            delle immagini
-	 */
-	private void cambiaImmagine(int girandola, int indexImmagine) {
-		girandola -= 1; // Così possiamo usare girandola 1-2-3 e non 0-1-2
-
-		// i<Numero di rotazioni che deve fare (a caso tipo)
-		int giraFinoA = (int) (Math.random() * 20 + 20);
-		for (int i = 0; i < giraFinoA; i++) {
-			// random così sembra uno shuffle casuale
-			// System.out.println("Ciao da girandola numero " + girandola);
-			int randSleep = (int) ((Math.random() * 10) + 50);
-			try {
-				Thread.sleep(randSleep);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+		display.asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				MessageDialog.openConfirm(shlSlotMachine, titolo, testo);
 			}
-			int immagineRandom = random();
-			cambiaImmagineDaThread(girandola, immagineRandom);
-			
-			// alla fine impostiamo l'immagine quella finale
-			// OggettoGirandola[girandola].immagine =
-			// listaImmagini[indexImmagine];
-		}
+		});
 	}
 
 	private boolean haVinto() {
