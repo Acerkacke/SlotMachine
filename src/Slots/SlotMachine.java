@@ -14,6 +14,15 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.KeyListener;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+
 public class SlotMachine implements KeyListener {
 	Display display;
 	protected Shell shlSlotMachine;
@@ -39,19 +48,30 @@ public class SlotMachine implements KeyListener {
 			"/Immagini/sette.png" };
 	private int threadCheHannoFinito = 0;
 	private boolean haFinito = true;
+	private Clip levaClip;
+	private AudioInputStream audioIn;
 
+	
 	/**
 	 * Launch the application.
 	 * 
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		
 		try {
 			SlotMachine window = new SlotMachine();
 			window.open();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	/**
+	 * Costruttore vuoto
+	 */
+	protected SlotMachine(){
+        
 	}
 
 	/**
@@ -97,10 +117,24 @@ public class SlotMachine implements KeyListener {
 			}
 		});
 	}
-
+	
+	public void playSound(){
+		try{
+			File file = new File("src/Suoni/Leva.wav");
+	        audioIn = AudioSystem.getAudioInputStream(file);
+			levaClip = AudioSystem.getClip();
+	        levaClip.open(audioIn);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		levaClip.start();
+	}
+	
+	
 	public void gira() {
 		if (haFinito) {
 			if (bet > 0) {
+				playSound();
 				threadCheHannoFinito = 0;
 				haFinito = false;
 				ThreadGirandola t1 = new ThreadGirandola(1);
@@ -127,12 +161,22 @@ public class SlotMachine implements KeyListener {
 			finito();
 		}
 	}
+	
+private void stopPlay(){
+		if(levaClip != null){
+			levaClip.stop();
+			levaClip.close();
+			levaClip = null;
+		}
+	}
+
 
 	/**
 	 * Quando le girandole hanno finito di girare
 	 */
 	public void finito() {
-		System.out.println("Finito");
+		//System.out.println("Finito");
+		stopPlay();
 		controlloF();
 	}
 
@@ -209,6 +253,7 @@ public class SlotMachine implements KeyListener {
 			}
 			int immagineRandom = random();
 			cambiaImmagineDaThread(girandola, immagineRandom);
+			
 			// alla fine impostiamo l'immagine quella finale
 			// OggettoGirandola[girandola].immagine =
 			// listaImmagini[indexImmagine];
@@ -366,7 +411,7 @@ public class SlotMachine implements KeyListener {
 		btnGira.addKeyListener(this);
 
 		lblGirandola1 = new Label(shlSlotMachine, SWT.BORDER | SWT.WRAP | SWT.SHADOW_NONE | SWT.CENTER);
-		lblGirandola1.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_HIGHLIGHT_SHADOW));
+		lblGirandola1.setBackground(SWTResourceManager.getColor(SWT.COLOR_CYAN));
 		lblGirandola1.setImage(SWTResourceManager.getImage(SlotMachine.class, "/Immagini/arancia.png"));
 		lblGirandola1.setBounds(10, 75, 150, 150);
 		formToolkit.adapt(lblGirandola1, true, true);
@@ -388,6 +433,7 @@ public class SlotMachine implements KeyListener {
 		txtCrediti.setText("" + crediti);
 		txtCrediti.setBounds(10, 281, 150, 21);
 		formToolkit.adapt(txtCrediti, true, true);
+		txtCrediti.addKeyListener(this);
 
 		Label lblCrediti = new Label(shlSlotMachine, SWT.NONE);
 		lblCrediti.setBackground(SWTResourceManager.getColor(240, 240, 240));
@@ -400,6 +446,7 @@ public class SlotMachine implements KeyListener {
 		txtBet.setText("" + bet);
 		txtBet.setBounds(210, 281, 76, 21);
 		formToolkit.adapt(txtBet, true, true);
+		txtBet.addKeyListener(this);
 
 		Label lblBet = new Label(shlSlotMachine, SWT.NONE);
 		lblBet.setBounds(210, 260, 76, 15);
@@ -411,6 +458,7 @@ public class SlotMachine implements KeyListener {
 		txtVincita.setText("" + pvincita);
 		txtVincita.setBounds(324, 281, 150, 21);
 		formToolkit.adapt(txtVincita, true, true);
+		txtVincita.addKeyListener(this);
 
 		Label lblPossibileVincita = new Label(shlSlotMachine, SWT.NONE);
 		lblPossibileVincita.setBounds(324, 260, 150, 15);
@@ -426,24 +474,29 @@ public class SlotMachine implements KeyListener {
 
 	@Override
 	public void keyReleased(org.eclipse.swt.events.KeyEvent arg0) {
-		// SU
-		if (arg0.keyCode == 0x1000001) {
-			if (crediti > 0) {
-				bet += 1;
-				crediti -= 1;
-				pvincita = bet * 2;
-			} else {
-				System.out.println(crediti);
+		if (haFinito) {
+			// SU
+			if (arg0.character == 'w') {
+				if (crediti > 0) {
+					bet += 1;
+					crediti -= 1;
+					pvincita = bet * 2;
+				} else {
+					System.out.println(crediti);
+				}
 			}
-		}
-		// GIU
-		if (arg0.keyCode == 0x1000002) {
-			if (bet > 1) {
-				bet -= 1;
-				crediti += 1;
-				pvincita = bet * 2;
-			} else {
-				System.out.println("Non hai abbastanza bet");
+			// GIU
+			if (arg0.character == 's') {
+				if (bet > 1) {
+					bet -= 1;
+					crediti += 1;
+					pvincita = bet * 2;
+				} else {
+					System.out.println("Non hai abbastanza bet");
+				}
+			}
+			if (arg0.character == 'g') {
+				gira();
 			}
 		}
 
